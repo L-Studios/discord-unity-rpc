@@ -152,7 +152,6 @@ namespace LStudios.DiscordUnityRpc
         {
             if (transportDisposed)
             {
-                ReportError("Discord Rich Presence needs to be reinitialized after being disabled.");
                 return;
             }
 
