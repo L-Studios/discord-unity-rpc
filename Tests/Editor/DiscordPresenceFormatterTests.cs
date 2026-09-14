@@ -107,6 +107,40 @@ namespace LStudios.DiscordUnityRpc.Tests
             Assert.That(payload.StartTimestamp, Is.EqualTo(1234L));
         }
 
+        [Test]
+        public void MapsTransportNeutralPayloadToDiscordRpc()
+        {
+            var payload = new PresencePayload(
+                "Working on SecretGame",
+                "Editing scene MainMenu",
+                "unity6-logo",
+                "Unity 6000.3.24f1",
+                1234L,
+                new[] { new PresenceButton("Repository", "https://github.com/L-Studios") });
+
+            var presence = DiscordRpcTransport.CreateRichPresence(payload);
+
+            Assert.That(presence.Details, Is.EqualTo(payload.Details));
+            Assert.That(presence.State, Is.EqualTo(payload.State));
+            Assert.That(presence.Assets.LargeImageKey, Is.EqualTo("unity6-logo"));
+            Assert.That(presence.Assets.LargeImageText, Is.EqualTo("Unity 6000.3.24f1"));
+            Assert.That(presence.Assets.SmallImageKey, Is.Null.Or.Empty);
+            Assert.That(presence.Timestamps.Start.Value.Kind, Is.EqualTo(System.DateTimeKind.Utc));
+            Assert.That(presence.Buttons, Has.Length.EqualTo(1));
+            Assert.That(presence.Buttons[0].Label, Is.EqualTo("Repository"));
+            Assert.That(presence.Buttons[0].Url, Is.EqualTo("https://github.com/L-Studios"));
+        }
+
+        [Test]
+        public void OmittedTimestampDoesNotCreateDiscordTimestamps()
+        {
+            var payload = new PresencePayload("Details", "State", "unity-logo", "Unity", null, null);
+
+            var presence = DiscordRpcTransport.CreateRichPresence(payload);
+
+            Assert.That(presence.Timestamps, Is.Null);
+        }
+
         private static EditorContextSnapshot Snapshot(EditorActivityKind kind)
         {
             return new EditorContextSnapshot(
