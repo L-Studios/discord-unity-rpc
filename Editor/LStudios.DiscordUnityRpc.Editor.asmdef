@@ -1,0 +1,20 @@
+{
+  "name": "LStudios.DiscordUnityRpc.Editor",
+  "rootNamespace": "LStudios.DiscordUnityRpc",
+  "references": [
+    "Unity.Newtonsoft.Json"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "DiscordRPC.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

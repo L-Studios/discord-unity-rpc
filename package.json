@@ -1,0 +1,31 @@
+{
+  "name": "com.lstudios.discord-unity-rpc",
+  "version": "1.0.0",
+  "displayName": "L.Studios Discord Unity RPC",
+  "description": "Privacy-aware Discord Rich Presence for the Unity Editor.",
+  "unity": "2019.4",
+  "license": "MIT",
+  "documentationUrl": "https://github.com/L-Studios/discord-unity-rpc/blob/main/Documentation~/index.md",
+  "changelogUrl": "https://github.com/L-Studios/discord-unity-rpc/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/L-Studios/discord-unity-rpc/blob/main/LICENSE.md",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.3"
+  },
+  "samples": [
+    {
+      "displayName": "Basic Usage",
+      "description": "Enable and configure Discord Rich Presence for this project.",
+      "path": "Samples~/Basic Usage"
+    }
+  ],
+  "keywords": [
+    "discord",
+    "rich-presence",
+    "editor",
+    "unity"
+  ],
+  "author": {
+    "name": "L.Studios",
+    "url": "https://github.com/L-Studios"
+  }
+}

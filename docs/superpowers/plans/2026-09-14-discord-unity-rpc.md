@@ -70,7 +70,7 @@
 
 ### Vendored dependency
 
-- `Editor/ThirdParty/DiscordRPC/DiscordRPC.dll`: official v1.6.2 release binary from `Lachee/discord-rpc-csharp`.
+- `Editor/ThirdParty/DiscordRPC/DiscordRPC.dll`: official v1.6.2 `netstandard2.0` release binary from `Lachee/discord-rpc-csharp`.
 - `Editor/ThirdParty/DiscordRPC/DiscordRPC.dll.meta`: Editor-only importer configuration.
 - `Editor/ThirdParty/DiscordRPC/LICENSE`: upstream MIT license copied verbatim.
 - `Editor/ThirdParty/DiscordRPC/VERSION`: exact tag, commit, source URL, release-asset URL, and SHA-256.
@@ -162,7 +162,7 @@ Add the MIT license, initial changelog, Unity/IDE ignores, LF normalization, and
 
 - [ ] **Step 4: Fetch and verify the official RPC artifact**
 
-Use GitHub's release API for `Lachee/discord-rpc-csharp` tag `v1.6.2`; select the .NET Framework 4.5 `DiscordRPC.dll` artifact, download it directly from the release, compute SHA-256, and record tag, commit, asset URL, source URL, and hash in `Editor/ThirdParty/DiscordRPC/VERSION`. Copy the upstream MIT license verbatim and include its copyright in `Third Party Notices.md`.
+Use GitHub's release API for `Lachee/discord-rpc-csharp` tag `v1.6.2`; select `netstandard2.0-dll.zip`, download it directly from the release, compute SHA-256 for both the archive and extracted `DiscordRPC.dll`, and record tag, resolved commit, asset URL, source URL, and hashes in `Editor/ThirdParty/DiscordRPC/VERSION`. Copy the upstream MIT license verbatim and include its copyright in `Third Party Notices.md`.
 
 Do not copy the DLL from the installed CustomRP directory; use the public upstream artifact so provenance is reproducible.
 

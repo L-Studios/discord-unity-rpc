@@ -1,0 +1,8 @@
+name=Discord RPC C#
+repository=https://github.com/Lachee/discord-rpc-csharp
+tag=v1.6.2
+commit=25dc4c2006ba9a1689a693f20d44e28ff5ced5a8
+asset=https://github.com/Lachee/discord-rpc-csharp/releases/download/v1.6.2/netstandard2.0-dll.zip
+asset_sha256=5E6BCCAA181775234E601000D3DD36FB54C77FE669C45816310764FF74FBC935
+dll_sha256=956B14CEB0CBF7DC75A77D3CBD41312AA82B3CE717CB543350BFD3CD65EB8A52
+license_sha256=0D366326B9A0B2A5AF77FD49212F27FED2110B1A69A112BE30523633426B8119
