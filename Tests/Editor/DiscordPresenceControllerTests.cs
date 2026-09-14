@@ -99,6 +99,42 @@ namespace LStudios.DiscordUnityRpc.Tests
         }
 
         [Test]
+        public void RepeatedDisconnectNotificationDoesNotResetBackoff()
+        {
+            var fixture = new Fixture(true);
+            fixture.Controller.Start();
+            fixture.Transport.RaiseDisconnected();
+            fixture.Clock.Advance(5.0);
+            fixture.Controller.Tick();
+
+            fixture.Transport.RaiseDisconnected();
+            fixture.Clock.Advance(5.0);
+            fixture.Controller.Tick();
+
+            Assert.That(fixture.Transport.InitializeTimes, Is.EqualTo(new[] { 0.0, 5.0 }));
+            fixture.Clock.Advance(10.0);
+            fixture.Controller.Tick();
+            Assert.That(fixture.Transport.InitializeTimes, Is.EqualTo(new[] { 0.0, 5.0, 20.0 }));
+        }
+
+        [Test]
+        public void ClearNowCancelsPendingPublishUntilContextChanges()
+        {
+            var fixture = new Fixture(true);
+            fixture.Controller.Start();
+
+            fixture.Controller.ClearNow();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+            Assert.That(fixture.Transport.Payloads, Is.Empty);
+
+            fixture.Context.RaiseChanged();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+            Assert.That(fixture.Transport.Payloads, Has.Count.EqualTo(1));
+        }
+
+        [Test]
         public void DisableClearsAndDisposesTransport()
         {
             var fixture = new Fixture(true);

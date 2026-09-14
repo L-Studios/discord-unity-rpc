@@ -94,8 +94,12 @@ namespace LStudios.DiscordUnityRpc
 
             if (clock.TimeSinceStartup >= retryAt)
             {
+                retryAt = double.PositiveInfinity;
                 TryInitializeTransport();
-                ScheduleNextRetry();
+                if (double.IsPositiveInfinity(retryAt))
+                {
+                    ScheduleNextRetry();
+                }
             }
 
             if (pendingSnapshot == null || clock.TimeSinceStartup < publishAt || !transportInitialized)
@@ -117,7 +121,10 @@ namespace LStudios.DiscordUnityRpc
             }
 
             TryClear();
+            pendingSnapshot = null;
+            desiredPayload = null;
             lastSentPayload = null;
+            publishAt = double.PositiveInfinity;
             manuallyCleared = true;
         }
 
@@ -250,8 +257,10 @@ namespace LStudios.DiscordUnityRpc
                 return;
             }
 
-            retryAttempt = 0;
-            ScheduleNextRetry();
+            if (double.IsPositiveInfinity(retryAt))
+            {
+                ScheduleNextRetry();
+            }
         }
 
         private void TryInitializeTransport()

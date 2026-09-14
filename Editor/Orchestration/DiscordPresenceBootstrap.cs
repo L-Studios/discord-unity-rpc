@@ -43,7 +43,7 @@ namespace LStudios.DiscordUnityRpc
 
         private static void ScheduleRebuild()
         {
-            if (shuttingDown)
+            if (shuttingDown || preferences == null || preferences.Current.Enabled)
             {
                 return;
             }
