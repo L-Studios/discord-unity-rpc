@@ -1,5 +1,9 @@
 .worktrees/
 .vendor-tmp-*/
+UnityTestProject/
+.unity-create.log
+.unity-test.log
+.unity-test-results.xml
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
