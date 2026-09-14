@@ -1,0 +1,81 @@
+# Discord Unity RPC documentation
+
+## Installation and first run
+
+Install `https://github.com/L-Studios/discord-unity-rpc.git` through Unity Package Manager's **Add package from git URL** action. The package requires Unity 2019.4 or newer.
+
+Open **Edit > Preferences > L.Studios > Discord Unity RPC**. Rich Presence is off until the current user explicitly enables it for the current project. Enabling one project does not enable another.
+
+## Preferences
+
+- **Enable Rich Presence:** creates the local Discord IPC connection and begins publishing editor context.
+- **Show project name:** uses `Working on {project}`; otherwise uses `Working in Unity`.
+- **Show scene name:** controls scene names in editing and Play Mode states.
+- **Show prefab name:** controls the current Prefab Mode asset name.
+- **Show elapsed session time:** includes the stable Unity Editor session start time.
+- **Log level:** `Off`, `Errors`, or `Verbose`. Errors are rate-limited and logs never contain credentials or payload JSON.
+- **Buttons:** up to two optional label/URL pairs. A button is transmitted only when its label is non-empty and its URL is absolute HTTPS.
+- **Clear Presence:** removes the current activity without disabling the service. The next real context change publishes again.
+
+Settings live in the current user's `EditorPrefs`. The project path is normalized and SHA-256 hashed for the key prefix; the raw path is not stored in a key or value.
+
+## State model
+
+The formatter uses this strict priority:
+
+1. Compiling scripts.
+2. Play Mode.
+3. Prefab Mode.
+4. Scene editing.
+
+Context changes are debounced for one second. Only the latest snapshot is formatted, and a payload equal to the previous payload is not sent again.
+
+| Context | Visible state | Hidden-name state |
+| --- | --- | --- |
+| Compiling | `Compiling scripts` | `Compiling scripts` |
+| Play Mode | `Testing scene {scene}` | `Testing a scene` |
+| Prefab Mode | `Editing prefab {prefab}` | `Editing a prefab` |
+| Scene editing | `Editing scene {scene}` | `Editing a scene` |
+
+Strings are trimmed and limited to 128 Unicode text elements without splitting surrogate pairs. Button labels are limited to 32 Unicode text elements.
+
+## Artwork
+
+Only a large image is sent:
+
+- Unity 6 / version major `6000` or newer: `unity6-logo`.
+- Unity 2021 through 2023: `unity-logo`.
+- Unity 2019.4 and 2020: `unity-logo-old`.
+
+The large-image tooltip is the full Unity version. No small image is set, and the Discord application asset `game-icon` is never used.
+
+## Connection lifecycle
+
+The managed RPC adapter connects to Discord's local IPC endpoint with Application ID `1346887919675113567`. It does not authenticate a Discord account.
+
+When disconnected, the controller retains the latest desired payload and retries after 5, 15, 30, then 60 seconds. Later retries remain capped at 60 seconds. A successful connection resets the schedule and republishes the latest desired payload.
+
+Disabling the setting, reloading assemblies, or quitting Unity performs a best-effort clear followed by deterministic disposal.
+
+## Compatibility and package boundaries
+
+All package C# code and the vendored DLL are constrained to the Editor platform by assembly and plugin import metadata. Nothing is intended for a player build.
+
+Prefab Stage references are isolated behind this compile-time boundary:
+
+- Unity 2021.2+: `UnityEditor.SceneManagement`.
+- Unity 2019.4 through 2021.1: `UnityEditor.Experimental.SceneManagement`.
+
+The implementation stays within Unity's C# 7.3 language surface.
+
+## Troubleshooting
+
+- Confirm the desktop Discord client is running and Activity Privacy is enabled.
+- An Invisible Discord status can hide activity from other users.
+- Flatpak or other sandboxed Linux Discord clients may block access to the IPC socket.
+- Correct invalid button fields shown inline in Preferences.
+- Set logging to `Errors` for actionable failures or `Verbose` while diagnosing connection changes.
+
+## Security and privacy
+
+The Application ID is public metadata. The package contains no bot token, client secret, OAuth token, private key, telemetry, analytics, or crash reporter. Context selected by the user travels only to the local Discord client through Discord RPC.

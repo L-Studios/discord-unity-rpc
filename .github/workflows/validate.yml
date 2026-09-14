@@ -1,0 +1,28 @@
+name: Validate package
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate package layout and safety rules
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File "Tools~/validate-package.ps1"
+
+      - name: Parse JSON manifests
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @('package.json') + @(Get-ChildItem -Recurse -File -Filter '*.asmdef' | ForEach-Object FullName)
+          foreach ($file in $files) {
+            Get-Content -LiteralPath $file -Raw | ConvertFrom-Json | Out-Null
+            Write-Output "Valid JSON: $file"
+          }
