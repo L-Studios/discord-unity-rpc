@@ -5,6 +5,8 @@ namespace LStudios.DiscordUnityRpc
         EditingScene,
         EditingPrefab,
         Playing,
-        Compiling
+        Compiling,
+        Building,
+        Idle
     }
 }

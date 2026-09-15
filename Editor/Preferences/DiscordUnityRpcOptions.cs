@@ -1,3 +1,5 @@
+using System;
+
 namespace LStudios.DiscordUnityRpc
 {
     internal enum DiscordUnityRpcLogLevel
@@ -9,12 +11,18 @@ namespace LStudios.DiscordUnityRpc
 
     internal sealed class DiscordUnityRpcOptions
     {
+        internal const int DefaultIdleTimeoutMinutes = 5;
+        internal const int MaxIdleTimeoutMinutes = 120;
+
         internal DiscordUnityRpcOptions()
         {
             ShowProjectName = true;
             ShowSceneName = true;
             ShowPrefabName = true;
             ShowElapsedTime = true;
+            ShowActiveTool = true;
+            ShowBuildTarget = true;
+            IdleTimeoutMinutes = DefaultIdleTimeoutMinutes;
             LogLevel = DiscordUnityRpcLogLevel.Errors;
             ButtonOneLabel = string.Empty;
             ButtonOneUrl = string.Empty;
@@ -27,11 +35,22 @@ namespace LStudios.DiscordUnityRpc
         internal bool ShowSceneName { get; set; }
         internal bool ShowPrefabName { get; set; }
         internal bool ShowElapsedTime { get; set; }
+        internal bool ShowActiveTool { get; set; }
+        internal bool ShowBuildTarget { get; set; }
+
+        /// <summary>Minutes Unity must stay unfocused before presence shows Idle; 0 disables it.</summary>
+        internal int IdleTimeoutMinutes { get; set; }
+
         internal DiscordUnityRpcLogLevel LogLevel { get; set; }
         internal string ButtonOneLabel { get; set; }
         internal string ButtonOneUrl { get; set; }
         internal string ButtonTwoLabel { get; set; }
         internal string ButtonTwoUrl { get; set; }
+
+        internal static int ClampIdleTimeout(int minutes)
+        {
+            return Math.Max(0, Math.Min(MaxIdleTimeoutMinutes, minutes));
+        }
 
         internal DiscordUnityRpcOptions Copy()
         {
@@ -42,6 +61,9 @@ namespace LStudios.DiscordUnityRpc
                 ShowSceneName = ShowSceneName,
                 ShowPrefabName = ShowPrefabName,
                 ShowElapsedTime = ShowElapsedTime,
+                ShowActiveTool = ShowActiveTool,
+                ShowBuildTarget = ShowBuildTarget,
+                IdleTimeoutMinutes = IdleTimeoutMinutes,
                 LogLevel = LogLevel,
                 ButtonOneLabel = ButtonOneLabel ?? string.Empty,
                 ButtonOneUrl = ButtonOneUrl ?? string.Empty,

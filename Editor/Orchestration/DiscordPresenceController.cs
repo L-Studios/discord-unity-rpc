@@ -27,6 +27,8 @@ namespace LStudios.DiscordUnityRpc
         private bool transportDisposed;
         private bool errorReported;
         private bool manuallyCleared;
+        private double inactiveSince = double.NaN;
+        private bool idle;
 
         internal DiscordPresenceController(
             IEditorContextSource contextSource,
@@ -102,15 +104,8 @@ namespace LStudios.DiscordUnityRpc
                 }
             }
 
-            if (pendingSnapshot == null || clock.TimeSinceStartup < publishAt || !transportInitialized)
-            {
-                return;
-            }
-
-            desiredPayload = formatter.Format(pendingSnapshot, options, sessionStartedAt);
-            pendingSnapshot = null;
-            publishAt = double.PositiveInfinity;
-            PublishDesired(false);
+            UpdateIdleState();
+            PublishPendingIfDue();
         }
 
         internal void ClearNow()
@@ -176,10 +171,83 @@ namespace LStudios.DiscordUnityRpc
 
         private void OnContextChanged()
         {
-            if (options != null && options.Enabled)
+            if (options == null || !options.Enabled)
             {
-                QueueContext();
+                return;
             }
+
+            QueueContext();
+
+            // A player build blocks the editor loop, so the debounce would only elapse after the
+            // build finished. Publish right away; the RPC client sends from its own thread.
+            if (pendingSnapshot != null && pendingSnapshot.ActivityKind == EditorActivityKind.Building)
+            {
+                publishAt = clock.TimeSinceStartup;
+                PublishPendingIfDue();
+            }
+        }
+
+        private void PublishPendingIfDue()
+        {
+            if (pendingSnapshot == null || clock.TimeSinceStartup < publishAt || !transportInitialized)
+            {
+                return;
+            }
+
+            desiredPayload = FormatSnapshot(pendingSnapshot);
+            pendingSnapshot = null;
+            publishAt = double.PositiveInfinity;
+            PublishDesired(false);
+        }
+
+        private void UpdateIdleState()
+        {
+            if (options.IdleTimeoutMinutes <= 0 || contextSource.IsApplicationActive)
+            {
+                inactiveSince = double.NaN;
+                SetIdle(false);
+                return;
+            }
+
+            var now = clock.TimeSinceStartup;
+            if (double.IsNaN(inactiveSince))
+            {
+                inactiveSince = now;
+            }
+
+            if (now - inactiveSince >= options.IdleTimeoutMinutes * 60.0)
+            {
+                SetIdle(true);
+            }
+        }
+
+        private void SetIdle(bool value)
+        {
+            if (idle == value)
+            {
+                return;
+            }
+
+            idle = value;
+
+            // Idle is not a real context change, so it must not undo a manual Clear Presence.
+            if (!manuallyCleared)
+            {
+                pendingSnapshot = contextSource.Capture();
+                publishAt = clock.TimeSinceStartup;
+            }
+        }
+
+        private PresencePayload FormatSnapshot(EditorContextSnapshot snapshot)
+        {
+            if (idle
+                && snapshot.ActivityKind != EditorActivityKind.Building
+                && snapshot.ActivityKind != EditorActivityKind.Compiling)
+            {
+                snapshot = snapshot.WithActivityKind(EditorActivityKind.Idle);
+            }
+
+            return formatter.Format(snapshot, options, sessionStartedAt);
         }
 
         private void OnPreferencesChanged()
@@ -244,7 +312,7 @@ namespace LStudios.DiscordUnityRpc
             if (desiredPayload == null)
             {
                 var snapshot = pendingSnapshot ?? contextSource.Capture();
-                desiredPayload = formatter.Format(snapshot, options, sessionStartedAt);
+                desiredPayload = FormatSnapshot(snapshot);
             }
 
             PublishDesired(true);

@@ -100,6 +100,15 @@ namespace LStudios.DiscordUnityRpc
                 }
             };
 
+            if (payload.SmallImageKey.Length > 0)
+            {
+                presence.Assets.SmallImageKey = payload.SmallImageKey;
+                if (payload.SmallImageText.Length > 0)
+                {
+                    presence.Assets.SmallImageText = payload.SmallImageText;
+                }
+            }
+
             if (payload.StartTimestamp.HasValue)
             {
                 presence.Timestamps = new Timestamps

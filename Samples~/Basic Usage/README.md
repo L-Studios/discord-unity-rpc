@@ -7,6 +7,8 @@
 5. Enter Play Mode to see `Testing scene {scene}`.
 6. Trigger a script compilation to see `Compiling scripts`; compilation has the highest priority.
 7. Turn off individual project, scene, or prefab visibility toggles to verify neutral text replaces sensitive names.
-8. Use **Clear Presence** to remove the current activity until the next real context change, or disable Rich Presence to clear and close the connection.
+8. Focus the Animator or Timeline window to see the active tool, switch build target to see the small icon change, and start a player build to see `Building for {platform}`.
+9. With **Idle after (minutes)** set to `1`, switch to another application for a minute to see `Idle`.
+10. Use **Clear Presence** to remove the current activity until the next real context change, or disable Rich Presence to clear and close the connection.
 
 Discord must be running on the same computer. Optional buttons require a non-empty label and an absolute HTTPS URL.

@@ -29,12 +29,22 @@ namespace LStudios.DiscordUnityRpc
             var details = options.ShowProjectName && project.Length > 0
                 ? "Working on " + project
                 : "Working in Unity";
+            var toolState = options.ShowActiveTool ? FormatTool(snapshot.ActiveTool) : string.Empty;
+            var platformLabel = EditorPlatformResolver.GetLabel(snapshot.Platform);
 
             string state;
             switch (snapshot.ActivityKind)
             {
+                case EditorActivityKind.Building:
+                    state = platformLabel.Length > 0
+                        ? "Building for " + platformLabel
+                        : "Building a player";
+                    break;
                 case EditorActivityKind.Compiling:
                     state = "Compiling scripts";
+                    break;
+                case EditorActivityKind.Idle:
+                    state = "Idle";
                     break;
                 case EditorActivityKind.Playing:
                     state = options.ShowSceneName && scene.Length > 0
@@ -42,27 +52,78 @@ namespace LStudios.DiscordUnityRpc
                         : "Testing a scene";
                     break;
                 case EditorActivityKind.EditingPrefab:
-                    state = options.ShowPrefabName && prefab.Length > 0
-                        ? "Editing prefab " + prefab
-                        : "Editing a prefab";
+                    if (toolState.Length > 0)
+                    {
+                        state = toolState;
+                    }
+                    else
+                    {
+                        state = options.ShowPrefabName && prefab.Length > 0
+                            ? "Editing prefab " + prefab
+                            : "Editing a prefab";
+                    }
                     break;
                 default:
-                    state = options.ShowSceneName && scene.Length > 0
-                        ? "Editing scene " + scene
-                        : "Editing a scene";
+                    if (toolState.Length > 0)
+                    {
+                        state = toolState;
+                    }
+                    else
+                    {
+                        state = options.ShowSceneName && scene.Length > 0
+                            ? "Editing scene " + scene
+                            : "Editing a scene";
+                    }
                     break;
             }
 
             var version = DiscordText.Normalize(snapshot.UnityVersion, PresenceTextLimit);
             var imageText = version.Length == 0 ? "Unity Editor" : "Unity " + version;
+            var smallImageKey = options.ShowBuildTarget
+                ? PlatformAssetSelector.Select(snapshot.Platform)
+                : string.Empty;
+            var smallImageText = smallImageKey.Length == 0
+                ? string.Empty
+                : "Build target: " + platformLabel;
 
             return new PresencePayload(
                 DiscordText.Normalize(details, PresenceTextLimit),
                 DiscordText.Normalize(state, PresenceTextLimit),
                 UnityVersionAssetSelector.Select(snapshot.UnityVersion),
                 DiscordText.Normalize(imageText, PresenceTextLimit),
+                smallImageKey,
+                smallImageText,
                 options.ShowElapsedTime ? (long?)sessionStartedAtUnixSeconds : null,
                 CreateButtons(options));
+        }
+
+        private static string FormatTool(EditorToolKind tool)
+        {
+            switch (tool)
+            {
+                case EditorToolKind.Animator:
+                    return "Editing an Animator";
+                case EditorToolKind.Animation:
+                    return "Animating";
+                case EditorToolKind.Timeline:
+                    return "Editing a Timeline";
+                case EditorToolKind.ShaderGraph:
+                    return "Editing a Shader Graph";
+                case EditorToolKind.VfxGraph:
+                    return "Editing a VFX Graph";
+                case EditorToolKind.TilePalette:
+                    return "Painting tilemaps";
+                case EditorToolKind.Terrain:
+                    return "Editing terrain";
+                case EditorToolKind.Profiler:
+                    return "Profiling";
+                case EditorToolKind.SpriteEditor:
+                    return "Editing sprites";
+                case EditorToolKind.UIBuilder:
+                    return "Designing UI";
+                default:
+                    return string.Empty;
+            }
         }
 
         private static PresenceButton[] CreateButtons(DiscordUnityRpcOptions options)

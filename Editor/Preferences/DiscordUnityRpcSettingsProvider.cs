@@ -46,6 +46,19 @@ namespace LStudios.DiscordUnityRpc
             options.ShowElapsedTime = EditorGUILayout.Toggle("Show elapsed session time", options.ShowElapsedTime);
 
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Activity", EditorStyles.boldLabel);
+            options.ShowActiveTool = EditorGUILayout.Toggle("Show active tool", options.ShowActiveTool);
+            options.ShowBuildTarget = EditorGUILayout.Toggle("Show build target icon", options.ShowBuildTarget);
+            options.IdleTimeoutMinutes = EditorGUILayout.IntSlider(
+                "Idle after (minutes)",
+                options.IdleTimeoutMinutes,
+                0,
+                DiscordUnityRpcOptions.MaxIdleTimeoutMinutes);
+            EditorGUILayout.LabelField(
+                "Idle starts when Unity is not the focused application. Set to 0 to never show Idle.",
+                EditorStyles.wordWrappedMiniLabel);
+
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Optional buttons (HTTPS only)", EditorStyles.boldLabel);
             options.ButtonOneLabel = EditorGUILayout.TextField("Button 1 label", options.ButtonOneLabel);
             options.ButtonOneUrl = EditorGUILayout.TextField("Button 1 URL", options.ButtonOneUrl);
