@@ -107,6 +107,117 @@ namespace LStudios.DiscordUnityRpc.Tests
             Assert.That(payload.StartTimestamp, Is.EqualTo(1234L));
         }
 
+        [TestCase(EditorPlatformKind.Android, "Building for Android")]
+        [TestCase(EditorPlatformKind.IOS, "Building for iOS")]
+        [TestCase(EditorPlatformKind.Other, "Building a player")]
+        public void BuildingStateNamesTargetPlatform(EditorPlatformKind platform, string expected)
+        {
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.Building, EditorToolKind.Animator, platform),
+                new DiscordUnityRpcOptions(),
+                1234L);
+
+            Assert.That(payload.State, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void IdleStateKeepsProjectDetails()
+        {
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.Idle), new DiscordUnityRpcOptions(), 1234L);
+
+            Assert.That(payload.Details, Is.EqualTo("Working on SecretGame"));
+            Assert.That(payload.State, Is.EqualTo("Idle"));
+        }
+
+        [TestCase(EditorToolKind.Animator, "Editing an Animator")]
+        [TestCase(EditorToolKind.Animation, "Animating")]
+        [TestCase(EditorToolKind.Timeline, "Editing a Timeline")]
+        [TestCase(EditorToolKind.ShaderGraph, "Editing a Shader Graph")]
+        [TestCase(EditorToolKind.VfxGraph, "Editing a VFX Graph")]
+        [TestCase(EditorToolKind.TilePalette, "Painting tilemaps")]
+        [TestCase(EditorToolKind.Terrain, "Editing terrain")]
+        [TestCase(EditorToolKind.Profiler, "Profiling")]
+        [TestCase(EditorToolKind.SpriteEditor, "Editing sprites")]
+        [TestCase(EditorToolKind.UIBuilder, "Designing UI")]
+        public void ActiveToolReplacesEditingState(EditorToolKind tool, string expected)
+        {
+            var formatter = new DiscordPresenceFormatter();
+            var options = new DiscordUnityRpcOptions();
+
+            Assert.That(
+                formatter.Format(Snapshot(EditorActivityKind.EditingScene, tool), options, 1234L).State,
+                Is.EqualTo(expected));
+            Assert.That(
+                formatter.Format(Snapshot(EditorActivityKind.EditingPrefab, tool), options, 1234L).State,
+                Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void HiddenActiveToolKeepsSceneState()
+        {
+            var options = new DiscordUnityRpcOptions { ShowActiveTool = false };
+
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.EditingScene, EditorToolKind.Timeline), options, 1234L);
+
+            Assert.That(payload.State, Is.EqualTo("Editing scene MainMenu"));
+        }
+
+        [Test]
+        public void PlayModeIgnoresActiveTool()
+        {
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.Playing, EditorToolKind.Profiler), new DiscordUnityRpcOptions(), 1234L);
+
+            Assert.That(payload.State, Is.EqualTo("Testing scene MainMenu"));
+        }
+
+        [TestCase(EditorPlatformKind.Windows, "windows-logo", "Build target: Windows")]
+        [TestCase(EditorPlatformKind.Linux, "linux-logo", "Build target: Linux")]
+        [TestCase(EditorPlatformKind.Android, "android-logo", "Build target: Android")]
+        [TestCase(EditorPlatformKind.IOS, "ios-logo", "Build target: iOS")]
+        [TestCase(EditorPlatformKind.WebGL, "webgl-logo", "Build target: WebGL")]
+        [TestCase(EditorPlatformKind.MacOS, "", "")]
+        [TestCase(EditorPlatformKind.Other, "", "")]
+        [TestCase(EditorPlatformKind.Unknown, "", "")]
+        public void BuildTargetSelectsSmallImage(EditorPlatformKind platform, string key, string text)
+        {
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.EditingScene, EditorToolKind.None, platform),
+                new DiscordUnityRpcOptions(),
+                1234L);
+
+            Assert.That(payload.SmallImageKey, Is.EqualTo(key));
+            Assert.That(payload.SmallImageText, Is.EqualTo(text));
+        }
+
+        [Test]
+        public void HiddenBuildTargetOmitsSmallImage()
+        {
+            var options = new DiscordUnityRpcOptions { ShowBuildTarget = false };
+
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.EditingScene, EditorToolKind.None, EditorPlatformKind.Android),
+                options,
+                1234L);
+
+            Assert.That(payload.SmallImageKey, Is.Empty);
+            Assert.That(payload.SmallImageText, Is.Empty);
+        }
+
+        [Test]
+        public void MapsSmallImageToDiscordRpc()
+        {
+            var payload = new PresencePayload(
+                "Details", "State", "unity6-logo", "Unity", "android-logo", "Build target: Android", null, null);
+
+            var presence = DiscordRpcTransport.CreateRichPresence(payload);
+
+            Assert.That(presence.Assets.SmallImageKey, Is.EqualTo("android-logo"));
+            Assert.That(presence.Assets.SmallImageText, Is.EqualTo("Build target: Android"));
+        }
+
         [Test]
         public void MapsTransportNeutralPayloadToDiscordRpc()
         {
@@ -115,6 +226,8 @@ namespace LStudios.DiscordUnityRpc.Tests
                 "Editing scene MainMenu",
                 "unity6-logo",
                 "Unity 6000.3.24f1",
+                string.Empty,
+                string.Empty,
                 1234L,
                 new[] { new PresenceButton("Repository", "https://github.com/L-Studios") });
 
@@ -134,21 +247,26 @@ namespace LStudios.DiscordUnityRpc.Tests
         [Test]
         public void OmittedTimestampDoesNotCreateDiscordTimestamps()
         {
-            var payload = new PresencePayload("Details", "State", "unity-logo", "Unity", null, null);
+            var payload = new PresencePayload("Details", "State", "unity-logo", "Unity", null, null, null, null);
 
             var presence = DiscordRpcTransport.CreateRichPresence(payload);
 
             Assert.That(presence.Timestamps, Is.Null);
         }
 
-        private static EditorContextSnapshot Snapshot(EditorActivityKind kind)
+        private static EditorContextSnapshot Snapshot(
+            EditorActivityKind kind,
+            EditorToolKind tool = EditorToolKind.None,
+            EditorPlatformKind platform = EditorPlatformKind.Unknown)
         {
             return new EditorContextSnapshot(
                 "SecretGame",
                 "MainMenu",
                 "PlayerCard",
                 "6000.3.24f1",
-                kind);
+                kind,
+                tool,
+                platform);
         }
     }
 }

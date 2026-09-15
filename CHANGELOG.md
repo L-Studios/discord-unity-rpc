@@ -2,6 +2,16 @@
 
 All notable changes to this package are documented in this file.
 
+## [1.1.0] - 2026-09-14
+
+### Added
+
+- **Player build status:** presence shows `Building for {platform}` as soon as a player build starts, and returns to normal when it succeeds, fails, or is cancelled.
+- **Idle state:** presence shows `Idle` after Unity has been unfocused for a configurable number of minutes (default 5, `0` disables it). Idle never hides a build or script compilation, and it does not undo **Clear Presence**.
+- **Active tool:** the Animator, Animation, Timeline, Shader Graph, VFX Graph, Tile Palette, Terrain, Profiler, Sprite Editor, and UI Builder windows replace the editing state (for example `Editing a Timeline`). Utility windows such as the Inspector keep the last tool, so presence does not flicker.
+- **Build target icon:** the small image shows the active build target for Windows, Linux, Android, iOS, and WebGL.
+- New **Activity** settings: **Show active tool**, **Show build target icon**, and **Idle after (minutes)**.
+
 ## [1.0.1] - 2026-09-14
 
 ### Added

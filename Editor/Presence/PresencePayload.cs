@@ -11,6 +11,8 @@ namespace LStudios.DiscordUnityRpc
             string state,
             string largeImageKey,
             string largeImageText,
+            string smallImageKey,
+            string smallImageText,
             long? startTimestamp,
             PresenceButton[] buttons)
         {
@@ -18,6 +20,8 @@ namespace LStudios.DiscordUnityRpc
             State = state ?? string.Empty;
             LargeImageKey = largeImageKey ?? string.Empty;
             LargeImageText = largeImageText ?? string.Empty;
+            SmallImageKey = smallImageKey ?? string.Empty;
+            SmallImageText = smallImageText ?? string.Empty;
             StartTimestamp = startTimestamp;
             this.buttons = buttons == null ? new PresenceButton[0] : (PresenceButton[])buttons.Clone();
         }
@@ -26,6 +30,8 @@ namespace LStudios.DiscordUnityRpc
         internal string State { get; private set; }
         internal string LargeImageKey { get; private set; }
         internal string LargeImageText { get; private set; }
+        internal string SmallImageKey { get; private set; }
+        internal string SmallImageText { get; private set; }
         internal long? StartTimestamp { get; private set; }
         internal PresenceButton[] Buttons { get { return (PresenceButton[])buttons.Clone(); } }
 
@@ -36,6 +42,8 @@ namespace LStudios.DiscordUnityRpc
                 || !string.Equals(State, other.State, StringComparison.Ordinal)
                 || !string.Equals(LargeImageKey, other.LargeImageKey, StringComparison.Ordinal)
                 || !string.Equals(LargeImageText, other.LargeImageText, StringComparison.Ordinal)
+                || !string.Equals(SmallImageKey, other.SmallImageKey, StringComparison.Ordinal)
+                || !string.Equals(SmallImageText, other.SmallImageText, StringComparison.Ordinal)
                 || StartTimestamp != other.StartTimestamp
                 || buttons.Length != other.buttons.Length)
             {
@@ -66,6 +74,8 @@ namespace LStudios.DiscordUnityRpc
                 hash = (hash * 397) ^ State.GetHashCode();
                 hash = (hash * 397) ^ LargeImageKey.GetHashCode();
                 hash = (hash * 397) ^ LargeImageText.GetHashCode();
+                hash = (hash * 397) ^ SmallImageKey.GetHashCode();
+                hash = (hash * 397) ^ SmallImageText.GetHashCode();
                 hash = (hash * 397) ^ StartTimestamp.GetHashCode();
                 for (var index = 0; index < buttons.Length; index++)
                 {

@@ -41,6 +41,10 @@ namespace LStudios.DiscordUnityRpc
                     ShowSceneName = store.GetBool(Key("show-scene"), true),
                     ShowPrefabName = store.GetBool(Key("show-prefab"), true),
                     ShowElapsedTime = store.GetBool(Key("show-elapsed"), true),
+                    ShowActiveTool = store.GetBool(Key("show-active-tool"), true),
+                    ShowBuildTarget = store.GetBool(Key("show-build-target"), true),
+                    IdleTimeoutMinutes = DiscordUnityRpcOptions.ClampIdleTimeout(
+                        store.GetInt(Key("idle-timeout-minutes"), DiscordUnityRpcOptions.DefaultIdleTimeoutMinutes)),
                     LogLevel = ReadLogLevel(),
                     ButtonOneLabel = store.GetString(Key("button-1-label"), string.Empty),
                     ButtonOneUrl = store.GetString(Key("button-1-url"), string.Empty),
@@ -62,6 +66,9 @@ namespace LStudios.DiscordUnityRpc
             store.SetBool(Key("show-scene"), options.ShowSceneName);
             store.SetBool(Key("show-prefab"), options.ShowPrefabName);
             store.SetBool(Key("show-elapsed"), options.ShowElapsedTime);
+            store.SetBool(Key("show-active-tool"), options.ShowActiveTool);
+            store.SetBool(Key("show-build-target"), options.ShowBuildTarget);
+            store.SetInt(Key("idle-timeout-minutes"), DiscordUnityRpcOptions.ClampIdleTimeout(options.IdleTimeoutMinutes));
             store.SetInt(Key("log-level"), (int)options.LogLevel);
             store.SetString(Key("button-1-label"), options.ButtonOneLabel ?? string.Empty);
             store.SetString(Key("button-1-url"), options.ButtonOneUrl ?? string.Empty);

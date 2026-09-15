@@ -7,13 +7,17 @@ namespace LStudios.DiscordUnityRpc
             string sceneName,
             string prefabName,
             string unityVersion,
-            EditorActivityKind activityKind)
+            EditorActivityKind activityKind,
+            EditorToolKind activeTool = EditorToolKind.None,
+            EditorPlatformKind platform = EditorPlatformKind.Unknown)
         {
             ProjectName = projectName ?? string.Empty;
             SceneName = sceneName ?? string.Empty;
             PrefabName = prefabName ?? string.Empty;
             UnityVersion = unityVersion ?? string.Empty;
             ActivityKind = activityKind;
+            ActiveTool = activeTool;
+            Platform = platform;
         }
 
         internal string ProjectName { get; private set; }
@@ -21,5 +25,19 @@ namespace LStudios.DiscordUnityRpc
         internal string PrefabName { get; private set; }
         internal string UnityVersion { get; private set; }
         internal EditorActivityKind ActivityKind { get; private set; }
+        internal EditorToolKind ActiveTool { get; private set; }
+        internal EditorPlatformKind Platform { get; private set; }
+
+        internal EditorContextSnapshot WithActivityKind(EditorActivityKind activityKind)
+        {
+            return new EditorContextSnapshot(
+                ProjectName,
+                SceneName,
+                PrefabName,
+                UnityVersion,
+                activityKind,
+                ActiveTool,
+                Platform);
+        }
     }
 }

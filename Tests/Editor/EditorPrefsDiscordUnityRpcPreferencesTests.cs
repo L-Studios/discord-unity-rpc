@@ -19,7 +19,33 @@ namespace LStudios.DiscordUnityRpc.Tests
             Assert.That(options.ShowSceneName, Is.True);
             Assert.That(options.ShowPrefabName, Is.True);
             Assert.That(options.ShowElapsedTime, Is.True);
+            Assert.That(options.ShowActiveTool, Is.True);
+            Assert.That(options.ShowBuildTarget, Is.True);
+            Assert.That(options.IdleTimeoutMinutes, Is.EqualTo(5));
             Assert.That(options.LogLevel, Is.EqualTo(DiscordUnityRpcLogLevel.Errors));
+        }
+
+        [Test]
+        public void ActivityOptionsRoundTripAndIdleTimeoutIsClamped()
+        {
+            var preferences = new EditorPrefsDiscordUnityRpcPreferences(
+                "C:/Projects/One",
+                new FakeKeyValueStore());
+            var options = preferences.Current;
+            options.ShowActiveTool = false;
+            options.ShowBuildTarget = false;
+            options.IdleTimeoutMinutes = 999;
+
+            preferences.Save(options);
+            var saved = preferences.Current;
+
+            Assert.That(saved.ShowActiveTool, Is.False);
+            Assert.That(saved.ShowBuildTarget, Is.False);
+            Assert.That(saved.IdleTimeoutMinutes, Is.EqualTo(DiscordUnityRpcOptions.MaxIdleTimeoutMinutes));
+
+            options.IdleTimeoutMinutes = -3;
+            preferences.Save(options);
+            Assert.That(preferences.Current.IdleTimeoutMinutes, Is.EqualTo(0));
         }
 
         [Test]

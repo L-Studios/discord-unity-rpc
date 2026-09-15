@@ -160,9 +160,112 @@ namespace LStudios.DiscordUnityRpc.Tests
             Assert.That(fixture.Context.DisposeCalls, Is.EqualTo(1));
         }
 
+        [Test]
+        public void UnfocusedEditorBecomesIdleAfterTimeoutAndRecoversOnFocus()
+        {
+            var fixture = new Fixture(true);
+            fixture.Preferences.Options.IdleTimeoutMinutes = 1;
+            fixture.Controller.Start();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+
+            fixture.Context.IsApplicationActive = false;
+            fixture.Controller.Tick();
+            fixture.Clock.Advance(30.0);
+            fixture.Controller.Tick();
+            Assert.That(fixture.Transport.Payloads, Has.Count.EqualTo(1));
+
+            fixture.Clock.Advance(30.0);
+            fixture.Controller.Tick();
+            Assert.That(fixture.Transport.Payloads, Has.Count.EqualTo(2));
+            Assert.That(fixture.Transport.Payloads[1].State, Is.EqualTo("Idle"));
+
+            fixture.Context.IsApplicationActive = true;
+            fixture.Controller.Tick();
+            Assert.That(fixture.Transport.Payloads, Has.Count.EqualTo(3));
+            Assert.That(fixture.Transport.Payloads[2].State, Is.EqualTo("Editing scene First"));
+        }
+
+        [Test]
+        public void ZeroIdleTimeoutNeverShowsIdle()
+        {
+            var fixture = new Fixture(true);
+            fixture.Preferences.Options.IdleTimeoutMinutes = 0;
+            fixture.Controller.Start();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+
+            fixture.Context.IsApplicationActive = false;
+            fixture.Clock.Advance(3600.0);
+            fixture.Controller.Tick();
+
+            Assert.That(fixture.Transport.Payloads, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void IdleDoesNotHideCompilation()
+        {
+            var fixture = new Fixture(true);
+            fixture.Preferences.Options.IdleTimeoutMinutes = 1;
+            fixture.Context.Snapshot = Snapshot("First", EditorActivityKind.Compiling);
+            fixture.Controller.Start();
+            fixture.Context.IsApplicationActive = false;
+            fixture.Controller.Tick();
+            fixture.Clock.Advance(60.0);
+            fixture.Controller.Tick();
+
+            Assert.That(fixture.Transport.Payloads[fixture.Transport.Payloads.Count - 1].State, Is.EqualTo("Compiling scripts"));
+        }
+
+        [Test]
+        public void IdleTransitionDoesNotUndoManualClear()
+        {
+            var fixture = new Fixture(true);
+            fixture.Preferences.Options.IdleTimeoutMinutes = 1;
+            fixture.Controller.Start();
+            fixture.Controller.ClearNow();
+
+            fixture.Context.IsApplicationActive = false;
+            fixture.Controller.Tick();
+            fixture.Clock.Advance(60.0);
+            fixture.Controller.Tick();
+            fixture.Context.IsApplicationActive = true;
+            fixture.Controller.Tick();
+
+            Assert.That(fixture.Transport.Payloads, Is.Empty);
+        }
+
+        [Test]
+        public void BuildStartPublishesWithoutWaitingForDebounce()
+        {
+            var fixture = new Fixture(true);
+            fixture.Controller.Start();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+
+            fixture.Context.Snapshot = new EditorContextSnapshot(
+                "Project",
+                "First",
+                string.Empty,
+                "6000.3.24f1",
+                EditorActivityKind.Building,
+                EditorToolKind.None,
+                EditorPlatformKind.Android);
+            fixture.Context.RaiseChanged();
+
+            Assert.That(fixture.Transport.Payloads, Has.Count.EqualTo(2));
+            Assert.That(fixture.Transport.Payloads[1].State, Is.EqualTo("Building for Android"));
+            Assert.That(fixture.Transport.Payloads[1].SmallImageKey, Is.EqualTo("android-logo"));
+        }
+
         private static EditorContextSnapshot Snapshot(string scene)
         {
-            return new EditorContextSnapshot("Project", scene, string.Empty, "6000.3.24f1", EditorActivityKind.EditingScene);
+            return Snapshot(scene, EditorActivityKind.EditingScene);
+        }
+
+        private static EditorContextSnapshot Snapshot(string scene, EditorActivityKind kind)
+        {
+            return new EditorContextSnapshot("Project", scene, string.Empty, "6000.3.24f1", kind);
         }
 
         private sealed class Fixture
@@ -204,6 +307,7 @@ namespace LStudios.DiscordUnityRpc.Tests
         private sealed class FakeContext : IEditorContextSource
         {
             public event Action ContextChanged;
+            public bool IsApplicationActive { get; set; } = true;
             internal EditorContextSnapshot Snapshot { get; set; }
             internal int DisposeCalls { get; private set; }
             public EditorContextSnapshot Capture() { return Snapshot; }
