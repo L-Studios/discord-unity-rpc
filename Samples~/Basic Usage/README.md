@@ -1,6 +1,6 @@
 # Basic Usage
 
-1. Open **Edit > Preferences > L.Studios > Discord Unity RPC**.
+1. Open **Window > Discord Unity RPC** (or **Edit > Preferences > L.Studios > Discord Unity RPC**).
 2. Read the disclosure and enable **Rich Presence** for this project.
 3. Open or switch a scene. After one second, Discord should show `Editing scene {scene}`.
 4. Open a prefab in Prefab Mode to see `Editing prefab {prefab}`.

@@ -4,9 +4,12 @@
 
 Install `https://github.com/L-Studios/discord-unity-rpc.git` through Unity Package Manager's **Add package from git URL** action. The package requires Unity 2019.4 or newer.
 
-Open **Edit > Preferences > L.Studios > Discord Unity RPC**. Rich Presence is off until the current user explicitly enables it for the current project. Enabling one project does not enable another.
+Open **Window > Discord Unity RPC**, or **Edit > Preferences > L.Studios > Discord Unity RPC**. Both show the same settings. Rich Presence is off until the current user explicitly enables it for the current project. Enabling one project does not enable another.
 
 ## Preferences
+
+The window and the Preferences page edit the same stored settings and show the same connection status.
+
 
 - **Enable Rich Presence:** creates the local Discord IPC connection and begins publishing editor context.
 - **Show project name:** uses `Working on {project}`; otherwise uses `Working in Unity`.

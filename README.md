@@ -14,11 +14,11 @@ The package is Editor-only: it does not add Discord code or `DiscordRPC.dll` to 
    https://github.com/L-Studios/discord-unity-rpc.git
    ```
 
-For a reproducible install, append a release tag such as `#v1.0.0`.
+For a reproducible install, append a release tag such as `#v1.0.1`.
 
 ## Enable it
 
-Open **Edit > Preferences > L.Studios > Discord Unity RPC** and enable **Rich Presence**. It is disabled by default for every user and every project.
+Open **Window > Discord Unity RPC** and enable **Rich Presence**. It is disabled by default for every user and every project. The same settings are also available in **Edit > Preferences > L.Studios > Discord Unity RPC**.
 
 You can independently hide the project, scene, or prefab name; hide elapsed session time; configure logging; and add up to two buttons with absolute HTTPS URLs. These choices are stored in `EditorPrefs` under a one-way hash of the project path, never in the project repository.
 
@@ -49,7 +49,8 @@ Windows, macOS, and Linux Editors are supported. Player builds, mobile Editors, 
 - **Discord shows you as invisible:** Rich Presence may not be visible to other people while your Discord status is Invisible.
 - **Linux/Flatpak:** sandboxed Discord packages may not expose their IPC socket to Unity. Use compatible host permissions or a non-sandboxed Discord installation.
 - **Invalid button warning:** both a label and an absolute `https://` URL are required.
-- **Stale presence:** use **Clear Presence** in preferences. The next editor-context change publishes again.
+- **Stale presence:** use **Clear Presence** in **Window > Discord Unity RPC** or in preferences. The next editor-context change publishes again.
+- **Package installed but no menu or preferences appear:** update to `v1.0.1` or newer. Version 1.0.0 shipped without `.meta` files, so Unity ignored the package contents.
 
 The connection retries after 5, 15, 30, and then 60 seconds while Discord is unavailable. Repeated failures are rate-limited unless the context changes.
 
@@ -59,7 +60,7 @@ No analytics, telemetry, crash reporting, account login, web API, or background 
 
 ## Development
 
-Run the metadata and safety validator from the repository root:
+Unity ignores files without a `.meta` in git-installed packages, so every new importable file or folder must ship with a committed `.meta` that has a unique GUID. Run the metadata and safety validator from the repository root:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "Tools~/validate-package.ps1"
