@@ -20,12 +20,13 @@ namespace LStudios.DiscordUnityRpc
             return new SettingsProvider("Preferences/L.Studios/Discord Unity RPC", SettingsScope.User)
             {
                 label = "Discord Unity RPC",
-                guiHandler = DrawPreferences,
+                guiHandler = searchContext => DrawSettingsGui(),
                 keywords = new[] { "Discord", "Rich Presence", "L.Studios", "Privacy" }
             };
         }
 
-        private static void DrawPreferences(string searchContext)
+        // Shared by Preferences and Window > Discord Unity RPC so both edit the same settings.
+        internal static void DrawSettingsGui()
         {
             var options = ProjectPreferences.Current;
 
