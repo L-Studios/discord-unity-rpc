@@ -15,7 +15,7 @@ namespace LStudios.DiscordUnityRpc
                 { "UnityEditor.Timeline.TimelineWindow", EditorToolKind.Timeline },
                 { "UnityEditor.ShaderGraph.Drawing.MaterialGraphEditWindow", EditorToolKind.ShaderGraph },
                 { "UnityEditor.VFX.UI.VFXViewWindow", EditorToolKind.VfxGraph },
-                { "UnityEditor.Tilemaps.GridPaletteWindow", EditorToolKind.TilePalette },
+                { "UnityEditor.Tilemaps.GridPaintPaletteWindow", EditorToolKind.TilePalette },
                 { "UnityEditor.ProfilerWindow", EditorToolKind.Profiler },
                 { "UnityEditor.U2D.Sprites.SpriteEditorWindow", EditorToolKind.SpriteEditor },
                 { "Unity.UI.Builder.Builder", EditorToolKind.UIBuilder }

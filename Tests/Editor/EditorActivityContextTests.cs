@@ -10,7 +10,7 @@ namespace LStudios.DiscordUnityRpc.Tests
         [TestCase("UnityEditor.Timeline.TimelineWindow", EditorToolKind.Timeline)]
         [TestCase("UnityEditor.ShaderGraph.Drawing.MaterialGraphEditWindow", EditorToolKind.ShaderGraph)]
         [TestCase("UnityEditor.VFX.UI.VFXViewWindow", EditorToolKind.VfxGraph)]
-        [TestCase("UnityEditor.Tilemaps.GridPaletteWindow", EditorToolKind.TilePalette)]
+        [TestCase("UnityEditor.Tilemaps.GridPaintPaletteWindow", EditorToolKind.TilePalette)]
         [TestCase("UnityEditor.ProfilerWindow", EditorToolKind.Profiler)]
         [TestCase("UnityEditor.U2D.Sprites.SpriteEditorWindow", EditorToolKind.SpriteEditor)]
         [TestCase("Unity.UI.Builder.Builder", EditorToolKind.UIBuilder)]
