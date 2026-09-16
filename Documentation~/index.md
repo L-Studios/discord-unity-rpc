@@ -19,8 +19,8 @@ The window and the Preferences page edit the same stored settings and show the s
 - **Show active tool:** replaces the editing state with the focused tool (see [Active tool](#active-tool)).
 - **Show build target icon:** sends the active build target as the small image (see [Artwork](#artwork)).
 - **Idle after (minutes):** `0`–`120`, default `5`. After Unity has been unfocused this long, the state becomes `Idle`. `0` disables Idle.
-- **Log level:** `Off`, `Errors`, or `Verbose`. Errors are rate-limited and logs never contain credentials or payload JSON.
-- **Buttons:** up to two optional label/URL pairs. A button is transmitted only when its label is non-empty and its URL is absolute HTTPS.
+- **Log level:** `Off`, `Errors`, or `Verbose`. Errors are rate-limited. `Verbose` also logs connection changes, **Clear Presence**, and each published state with its button labels. Logs never contain credentials, button URLs, or payload JSON.
+- **Buttons:** up to two optional label/URL pairs. A button is transmitted only when its label is non-empty and its URL is absolute HTTPS. Button 1 defaults to `Get Unity Rich Presence` → `https://github.com/L-Studios/discord-unity-rpc` until the user saves a different value; a cleared button stays cleared. Discord never shows your own buttons to you; other users see them.
 - **Clear Presence:** removes the current activity without disabling the service. The next real context change publishes again.
 
 Settings live in the current user's `EditorPrefs`. The project path is normalized and SHA-256 hashed for the key prefix; the raw path is not stored in a key or value.
@@ -128,6 +128,7 @@ The implementation stays within Unity's C# 7.3 language surface.
 - An Invisible Discord status can hide activity from other users.
 - Flatpak or other sandboxed Linux Discord clients may block access to the IPC socket.
 - Correct invalid button fields shown inline in Preferences.
+- If other users can't see your buttons, set logging to `Verbose` and confirm the Console shows `Published presence ... with N button(s)`. Then ask them to open your full profile. You cannot see or click your own buttons.
 - Set logging to `Errors` for actionable failures or `Verbose` while diagnosing connection changes.
 
 ## Security and privacy

@@ -12,6 +12,7 @@ namespace LStudios.DiscordUnityRpc
         private readonly IDiscordRpcTransport transport;
         private readonly IEditorClock clock;
         private readonly Action<string> errorLogger;
+        private readonly Action<string> verboseLogger;
 
         private DiscordUnityRpcOptions options;
         private EditorContextSnapshot pendingSnapshot;
@@ -36,7 +37,8 @@ namespace LStudios.DiscordUnityRpc
             DiscordPresenceFormatter formatter,
             IDiscordRpcTransport transport,
             IEditorClock clock,
-            Action<string> errorLogger)
+            Action<string> errorLogger,
+            Action<string> verboseLogger = null)
         {
             this.contextSource = contextSource ?? throw new ArgumentNullException("contextSource");
             this.preferences = preferences ?? throw new ArgumentNullException("preferences");
@@ -44,6 +46,7 @@ namespace LStudios.DiscordUnityRpc
             this.transport = transport ?? throw new ArgumentNullException("transport");
             this.clock = clock ?? throw new ArgumentNullException("clock");
             this.errorLogger = errorLogger;
+            this.verboseLogger = verboseLogger;
         }
 
         internal bool IsConnected { get { return transport.IsConnected; } }
@@ -121,6 +124,7 @@ namespace LStudios.DiscordUnityRpc
             lastSentPayload = null;
             publishAt = double.PositiveInfinity;
             manuallyCleared = true;
+            LogVerbose("Presence cleared until the next editor context change.");
         }
 
         public void Dispose()
@@ -303,6 +307,7 @@ namespace LStudios.DiscordUnityRpc
             retryAttempt = 0;
             retryAt = double.PositiveInfinity;
             errorReported = false;
+            LogVerbose("Connected to Discord.");
 
             if (manuallyCleared || options == null || !options.Enabled)
             {
@@ -327,6 +332,8 @@ namespace LStudios.DiscordUnityRpc
 
             if (double.IsPositiveInfinity(retryAt))
             {
+                // Logged once per retry cycle; repeated failures while waiting stay quiet.
+                LogVerbose("Disconnected from Discord; reconnecting automatically.");
                 ScheduleNextRetry();
             }
         }
@@ -387,6 +394,7 @@ namespace LStudios.DiscordUnityRpc
                 transport.SetPresence(desiredPayload);
                 lastSentPayload = desiredPayload;
                 errorReported = false;
+                LogVerbose(DescribePublished(desiredPayload));
             }
             catch (Exception exception)
             {
@@ -401,6 +409,27 @@ namespace LStudios.DiscordUnityRpc
             var index = Math.Min(retryAttempt, RetryDelays.Length - 1);
             retryAt = clock.TimeSinceStartup + RetryDelays[index];
             retryAttempt++;
+        }
+
+        private void LogVerbose(string message)
+        {
+            if (verboseLogger != null && options != null && options.LogLevel == DiscordUnityRpcLogLevel.Verbose)
+            {
+                verboseLogger(message);
+            }
+        }
+
+        // Summarises what was sent without logging URLs or payload JSON.
+        private static string DescribePublished(PresencePayload payload)
+        {
+            var buttons = payload.Buttons;
+            var description = "Published presence \"" + payload.State + "\" with " + buttons.Length + " button(s)";
+            for (var index = 0; index < buttons.Length; index++)
+            {
+                description += (index == 0 ? ": \"" : ", \"") + buttons[index].Label + "\"";
+            }
+
+            return description + ". Discord never shows your own buttons to you; other users see them on your profile.";
         }
 
         private void ReportError(string message)

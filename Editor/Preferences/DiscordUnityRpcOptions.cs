@@ -13,6 +13,8 @@ namespace LStudios.DiscordUnityRpc
     {
         internal const int DefaultIdleTimeoutMinutes = 5;
         internal const int MaxIdleTimeoutMinutes = 120;
+        internal const string DefaultButtonLabel = "Get Unity Rich Presence";
+        internal const string DefaultButtonUrl = "https://github.com/L-Studios/discord-unity-rpc";
 
         internal DiscordUnityRpcOptions()
         {
@@ -24,8 +26,8 @@ namespace LStudios.DiscordUnityRpc
             ShowBuildTarget = true;
             IdleTimeoutMinutes = DefaultIdleTimeoutMinutes;
             LogLevel = DiscordUnityRpcLogLevel.Errors;
-            ButtonOneLabel = string.Empty;
-            ButtonOneUrl = string.Empty;
+            ButtonOneLabel = DefaultButtonLabel;
+            ButtonOneUrl = DefaultButtonUrl;
             ButtonTwoLabel = string.Empty;
             ButtonTwoUrl = string.Empty;
         }

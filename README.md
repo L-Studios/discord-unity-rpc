@@ -14,13 +14,13 @@ The package is Editor-only: it does not add Discord code or `DiscordRPC.dll` to 
    https://github.com/L-Studios/discord-unity-rpc.git
    ```
 
-For a reproducible install, append a release tag such as `#v1.1.0`.
+For a reproducible install, append a release tag such as `#v1.1.1`.
 
 ## Enable it
 
 Open **Window > Discord Unity RPC** and enable **Rich Presence**. It is disabled by default for every user and every project. The same settings are also available in **Edit > Preferences > L.Studios > Discord Unity RPC**.
 
-You can independently hide the project, scene, or prefab name; hide elapsed session time; configure logging; and add up to two buttons with absolute HTTPS URLs. Under **Activity** you can also hide the active tool or the build target icon, and choose after how many unfocused minutes Unity shows as **Idle** (`0` turns Idle off). These choices are stored in `EditorPrefs` under a one-way hash of the project path, never in the project repository.
+You can independently hide the project, scene, or prefab name; hide elapsed session time; configure logging; and add up to two buttons with absolute HTTPS URLs. Button 1 defaults to **Get Unity Rich Presence**, linking to this repository; clear it to remove it. Under **Activity** you can also hide the active tool or the build target icon, and choose after how many unfocused minutes Unity shows as **Idle** (`0` turns Idle off). These choices are stored in `EditorPrefs` under a one-way hash of the project path, never in the project repository.
 
 ## Presence examples
 
@@ -55,6 +55,7 @@ Windows, macOS, and Linux Editors are supported. Player builds, mobile Editors, 
 - **Linux/Flatpak:** sandboxed Discord packages may not expose their IPC socket to Unity. Use compatible host permissions or a non-sandboxed Discord installation.
 - **Never shows Idle:** Idle is based on Unity losing focus to another application. Leaving Unity focused while away does not count, and `Idle after (minutes)` set to `0` disables it.
 - **Invalid button warning:** both a label and an absolute `https://` URL are required.
+- **Buttons not visible:** Discord never shows your own Rich Presence buttons to you. Ask someone else to open your full profile, or check from a second account. To confirm what was sent, set **Log level** to `Verbose`: the Unity Console shows `Published presence ... with N button(s)`.
 - **Stale presence:** use **Clear Presence** in **Window > Discord Unity RPC** or in preferences. The next editor-context change publishes again.
 - **Package installed but no menu or preferences appear:** update to `v1.0.1` or newer. Version 1.0.0 shipped without `.meta` files, so Unity ignored the package contents.
 

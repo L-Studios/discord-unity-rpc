@@ -258,6 +258,38 @@ namespace LStudios.DiscordUnityRpc.Tests
             Assert.That(fixture.Transport.Payloads[1].SmallImageKey, Is.EqualTo("android-logo"));
         }
 
+        [Test]
+        public void VerboseLogLevelReportsConnectionAndPublishedButtons()
+        {
+            var fixture = new Fixture(true);
+            fixture.Preferences.Options.LogLevel = DiscordUnityRpcLogLevel.Verbose;
+            fixture.Controller.Start();
+            fixture.Transport.RaiseConnected();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+            fixture.Controller.ClearNow();
+
+            Assert.That(fixture.VerboseLogs, Has.Some.EqualTo("Connected to Discord."));
+            Assert.That(
+                fixture.VerboseLogs,
+                Has.Some.StartsWith("Published presence \"Editing scene First\" with 1 button(s): \"Get Unity Rich Presence\"."));
+            Assert.That(fixture.VerboseLogs, Has.None.Contains("https://"));
+            Assert.That(fixture.VerboseLogs, Has.Some.StartsWith("Presence cleared"));
+        }
+
+        [Test]
+        public void ErrorsLogLevelDoesNotWriteVerboseLogs()
+        {
+            var fixture = new Fixture(true);
+            fixture.Controller.Start();
+            fixture.Transport.RaiseConnected();
+            fixture.Clock.Advance(1.0);
+            fixture.Controller.Tick();
+
+            Assert.That(fixture.Transport.Payloads, Is.Not.Empty);
+            Assert.That(fixture.VerboseLogs, Is.Empty);
+        }
+
         private static EditorContextSnapshot Snapshot(string scene)
         {
             return Snapshot(scene, EditorActivityKind.EditingScene);
@@ -276,14 +308,18 @@ namespace LStudios.DiscordUnityRpc.Tests
                 Context = new FakeContext { Snapshot = Snapshot("First") };
                 Preferences = new FakePreferences { Options = new DiscordUnityRpcOptions { Enabled = enabled } };
                 Transport = new FakeTransport(Clock);
+                VerboseLogs = new List<string>();
                 Controller = new DiscordPresenceController(
                     Context,
                     Preferences,
                     new DiscordPresenceFormatter(),
                     Transport,
                     Clock,
-                    null);
+                    null,
+                    VerboseLogs.Add);
             }
+
+            internal List<string> VerboseLogs { get; private set; }
 
             internal FakeClock Clock { get; private set; }
             internal FakeContext Context { get; private set; }

@@ -65,7 +65,8 @@ namespace LStudios.DiscordUnityRpc
                 new DiscordPresenceFormatter(),
                 transport,
                 new UnityEditorClock(),
-                LogError);
+                LogError,
+                LogVerbose);
             lifetime = new DiscordPresenceLifetime(controller.Dispose);
             EditorApplication.update += Tick;
             controller.Start();
@@ -122,6 +123,11 @@ namespace LStudios.DiscordUnityRpc
         private static void LogError(string message)
         {
             Debug.LogError("[L.Studios Discord Unity RPC] " + message);
+        }
+
+        private static void LogVerbose(string message)
+        {
+            Debug.Log("[L.Studios Discord Unity RPC] " + message);
         }
     }
 }

@@ -46,8 +46,8 @@ namespace LStudios.DiscordUnityRpc
                     IdleTimeoutMinutes = DiscordUnityRpcOptions.ClampIdleTimeout(
                         store.GetInt(Key("idle-timeout-minutes"), DiscordUnityRpcOptions.DefaultIdleTimeoutMinutes)),
                     LogLevel = ReadLogLevel(),
-                    ButtonOneLabel = store.GetString(Key("button-1-label"), string.Empty),
-                    ButtonOneUrl = store.GetString(Key("button-1-url"), string.Empty),
+                    ButtonOneLabel = store.GetString(Key("button-1-label"), DiscordUnityRpcOptions.DefaultButtonLabel),
+                    ButtonOneUrl = store.GetString(Key("button-1-url"), DiscordUnityRpcOptions.DefaultButtonUrl),
                     ButtonTwoLabel = store.GetString(Key("button-2-label"), string.Empty),
                     ButtonTwoUrl = store.GetString(Key("button-2-url"), string.Empty)
                 };
