@@ -51,6 +51,17 @@ namespace LStudios.DiscordUnityRpc.Tests
         }
 
         [Test]
+        public void DefaultOptionsPublishGetUnityRichPresenceButton()
+        {
+            var payload = new DiscordPresenceFormatter().Format(
+                Snapshot(EditorActivityKind.EditingScene), new DiscordUnityRpcOptions(), 1234L);
+
+            Assert.That(payload.Buttons, Has.Length.EqualTo(1));
+            Assert.That(payload.Buttons[0].Label, Is.EqualTo("Get Unity Rich Presence"));
+            Assert.That(payload.Buttons[0].Url, Is.EqualTo("https://github.com/L-Studios/discord-unity-rpc"));
+        }
+
+        [Test]
         public void InvalidOrNonHttpsButtonsAreOmitted()
         {
             var options = new DiscordUnityRpcOptions

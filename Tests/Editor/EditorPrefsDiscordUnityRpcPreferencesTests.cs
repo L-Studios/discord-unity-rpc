@@ -22,7 +22,27 @@ namespace LStudios.DiscordUnityRpc.Tests
             Assert.That(options.ShowActiveTool, Is.True);
             Assert.That(options.ShowBuildTarget, Is.True);
             Assert.That(options.IdleTimeoutMinutes, Is.EqualTo(5));
+            Assert.That(options.ButtonOneLabel, Is.EqualTo("Get Unity Rich Presence"));
+            Assert.That(options.ButtonOneUrl, Is.EqualTo("https://github.com/L-Studios/discord-unity-rpc"));
+            Assert.That(options.ButtonTwoLabel, Is.Empty);
+            Assert.That(options.ButtonTwoUrl, Is.Empty);
             Assert.That(options.LogLevel, Is.EqualTo(DiscordUnityRpcLogLevel.Errors));
+        }
+
+        [Test]
+        public void ClearedDefaultButtonStaysCleared()
+        {
+            var preferences = new EditorPrefsDiscordUnityRpcPreferences(
+                "C:/Projects/One",
+                new FakeKeyValueStore());
+            var options = preferences.Current;
+            options.ButtonOneLabel = string.Empty;
+            options.ButtonOneUrl = string.Empty;
+
+            preferences.Save(options);
+
+            Assert.That(preferences.Current.ButtonOneLabel, Is.Empty);
+            Assert.That(preferences.Current.ButtonOneUrl, Is.Empty);
         }
 
         [Test]

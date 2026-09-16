@@ -2,6 +2,20 @@
 
 All notable changes to this package are documented in this file.
 
+## [1.1.1] - 2026-09-16
+
+### Added
+
+- A default **Get Unity Rich Presence** button that links to `https://github.com/L-Studios/discord-unity-rpc`. It applies to projects that have never saved a Button 1 value, and clearing it in the settings keeps it cleared.
+
+### Fixed
+
+- The **Verbose** log level did nothing. It now logs to the Unity Console when Discord connects or disconnects, when presence is cleared, and each published state with its button labels. URLs and payload JSON are never logged.
+
+### Documentation
+
+- Explained that Discord never shows your own Rich Presence buttons to you; other users see them on your profile.
+
 ## [1.1.0] - 2026-09-14
 
 ### Added
